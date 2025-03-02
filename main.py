@@ -25,8 +25,6 @@ def main() -> None:
     event_handler = EventHandler()
 
     player = Entity(int(screen_width / 2), int(screen_height / 2), "@", (255, 255, 255))
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), "@", (255, 255, 0))
-    entities = {npc, player}
 
     game_map = generate_dungeon(
         max_rooms=max_rooms,
@@ -37,7 +35,7 @@ def main() -> None:
         player=player,
     )
 
-    engine = Engine(entities, event_handler, game_map, player)
+    engine = Engine(event_handler, game_map, player)
 
     with tcod.context.new_terminal(
         screen_width, screen_height, tileset=tileset, title="7DRL", vsync=True
