@@ -6,10 +6,14 @@ from tcod.console import Console
 import tile_types
 
 if TYPE_CHECKING:
+   from engine import Engine
    from entity import Entity
 
 class GameMap:
-    def __init__(self, width: int, height: int,entities: Iterable[Entity] = ()) -> None:
+    def __init__(
+        self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()
+    ):
+        self.engine = engine
         self.width, self.height = width, height
         self.entities = set(entities)
         self.tiles = np.full((width, height), fill_value=tile_types.wall, order="F")
@@ -36,10 +40,10 @@ class GameMap:
         Si no está en "Visible", pero SI esta en "Explored", entonces lo dibuja con los colores de "Dark".
         Si no esta en ningun lado, el predeterminado es "SHROUD""
         """
-        console.tiles_rgb[0:self.width, 0:self.height] = np.select(
+        console.tiles_rgb[0 : self.width, 0 : self.height] = np.select(
            condlist=[self.visible, self.explored],
            choicelist=[self.tiles["light"], self.tiles["dark"]],
-           default=tile_types.SHROUD
+           default=tile_types.SHROUD,
            )
         for entity in self.entities:
            # Imprime solo las entidades dentro del FOV
