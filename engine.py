@@ -10,12 +10,14 @@ from actions import EscapeAction, MovementAction
 
 
 from input_handlers import MainGameEventHandler
+from render_functions import render_bar
 
 
 if TYPE_CHECKING:
     from entity import Actor
     from game_map import GameMap
     from input_handlers import EventHandler
+
 
 class Engine:
     game_map: GameMap
@@ -34,18 +36,18 @@ class Engine:
             self.game_map.tiles["transparent"],
             (self.player.x, self.player.y),
             radius=8,
-            )
-        #Sí un Tile es "visible" entonces se debe agregar a "explored".
+        )
+        # Sí un Tile es "visible" entonces se debe agregar a "explored".
         self.game_map.explored |= self.game_map.visible
-        
 
     def render(self, console: Console, context: Context) -> None:
         self.game_map.render(console)
 
-        console.print(
-            x=1,
-            y=47,
-            string=f"HP: {self.player.fighter.hp}/{self.player.fighter.max_hp}",
+        render_bar(
+            console=console,
+            current_value=self.player.fighter.hp,
+            maximum_value=self.player.fighter.max_hp,
+            total_width=20,
         )
 
         context.present(console)
