@@ -5,10 +5,10 @@ from typing import Optional, Tuple, TYPE_CHECKING
 # Nos evita el import circular
 if TYPE_CHECKING:
     from engine import Engine
-    from entity import Entity
+    from entity import Actor, Entity
 
 class Action:
-    def __init__(self, entity: Entity) -> None:
+    def __init__(self, entity: Actor) -> None:
             super().__init__()
             self.entity = entity
 
@@ -25,9 +25,12 @@ class Action:
         """
         raise NotImplementedError()
 
+class WaitAction(Action):
+    def perform(self) -> None:
+        pass
 
 class ActionWithDirection(Action):
-    def __init__(self, entity: Entity, dx: int, dy: int):
+    def __init__(self, entity: Actor, dx: int, dy: int):
         super().__init__(entity)
 
         self.dx = dx
@@ -41,8 +44,13 @@ class ActionWithDirection(Action):
 
     @property
     def blocking_entity(self) -> Optional[Entity]:
-        """Return the blocking entity at this actions destination.."""
+        """Devuelve la entiedad que está bloqueando esa ubicación."""
         return self.engine.game_map.get_blocking_entity_at_location(*self.dest_xy)
+    
+    @property
+    def target_actor(self) -> Optional[Actor]:
+        """Devuelve el actor ubicado en el destiona de la acción."""
+        return self.engine.game_map.get_actor_at_location(*self.dest_xy)
 
 
     def perform(self) -> None:
@@ -51,11 +59,18 @@ class ActionWithDirection(Action):
 
 class MeleeAction(ActionWithDirection):
    def perform(self) -> None:
-       target = self.blocking_entity
-       if not target:
-           return  # No hay entidad para atacar.
+        target = self.target_actor
+        if not target:
+            return  # No hay entidad para atacar.
 
-       print(f"Atacaste a un {target.name}")
+        damage = self.entity.fighter.power - target.fighter.defense
+
+        attack_desc = f"{self.entity.name.capitalize()} atacó a {target.name}"
+        if damage > 0:
+            print(f"{attack_desc} con {damage} puntos de daño.")
+            target.fighter.hp -= damage
+        else:
+            print(f"{attack_desc} pero no hizo daño.")
 
 
 class EscapeAction(Action):
