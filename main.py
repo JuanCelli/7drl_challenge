@@ -1,10 +1,9 @@
 import copy
 import tcod
 
+import color
 from engine import Engine
 import entity_factories
-from game_map import GameMap
-from input_handlers import EventHandler
 from procgen import generate_dungeon
 
 
@@ -13,9 +12,9 @@ def main() -> None:
     screen_height = 50
 
     map_width = 80
-    map_height = 40
+    map_height = 38
 
-    max_monsters_per_room=2
+    max_monsters_per_room = 2
 
     room_max_size = 10
     room_min_size = 6
@@ -28,7 +27,6 @@ def main() -> None:
     player = copy.deepcopy(entity_factories.player)
     engine = Engine(player=player)
 
-
     engine.game_map = generate_dungeon(
         max_rooms=max_rooms,
         room_min_size=room_min_size,
@@ -40,6 +38,8 @@ def main() -> None:
     )
 
     engine.update_fov()
+
+    engine.message_log.add_message("¡Bienvenido!", color.welcome_text)
 
     with tcod.context.new_terminal(
         screen_width, screen_height, tileset=tileset, title="7DRL", vsync=True
